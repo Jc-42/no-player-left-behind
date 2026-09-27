@@ -12,6 +12,7 @@ Prevent anyone from playing on your SMP or co-op world until all players are onl
 - **Boss bar** showing `Waiting for players connected/remaining`.
 - **Countdown** (`Starting in 3`, `2`, `1`) once everyone is online. Configurable
 - **Grace period** when a required player leaves: a configurable `Freezing in 30s` warning counts down, and the world freezes only if they don't rejoin in time.
+- **Display choice.** The countdown and the warning can each show as big center text or small text above the hotbar.
 - **Server-side only.** Players join with a normal vanilla client, no mod needed.
 
 ## How it works
@@ -43,9 +44,13 @@ Players who aren't on the required list are frozen along with everyone else, but
 
   // Number of seconds everyone gets to rejoin after a required player leaves, before the world freezes.
   "gracePeriodSeconds": 30,
+  // Where the freeze warning appears: "title" for big text in the center of the screen, "actionbar" for small text above the hotbar.
+  "gracePeriodDisplay": "actionbar",
 
   // Length of the starting countdown.
-  "countdownSeconds": 3
+  "countdownSeconds": 3,
+  // Where the starting countdown appears: "title" or "actionbar".
+  "countdownDisplay": "title"
 }
 ```
 
@@ -110,6 +115,7 @@ Text for the Modrinth and CurseForge project pages.
 > - `requiredPlayers`: the usernames of everyone who must be online, for example `["Alex", "Steve"]`. Capitalization does not matter. Leave it empty to turn the mod off.
 > - `gracePeriodSeconds`: how many seconds everyone gets to rejoin after a required player leaves, before the world freezes. Default `30`.
 > - `countdownSeconds`: length of the starting countdown once everyone is online. Default `3`.
+> - `gracePeriodDisplay` and `countdownDisplay`: `"title"` for big text in the center of the screen, or `"actionbar"` for small text above the hotbar. Defaults `"actionbar"` and `"title"`.
 
 ## License
 

@@ -4,6 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundClearTitlesPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
@@ -50,6 +51,8 @@ public class LockManager {
 	private static Map<String, String> requiredNames = Map.of();
 	private static int gracePeriodSeconds = 30;
 	private static int countdownSeconds = 3;
+	private static boolean graceUsesActionBar = true;
+	private static boolean countdownUsesActionBar = false;
 
 	private static int secondsLeft;
 	private static int ticksIntoSecond;
@@ -64,6 +67,8 @@ public class LockManager {
 		requiredNames = config.requiredNames();
 		gracePeriodSeconds = config.gracePeriodSeconds;
 		countdownSeconds = config.countdownSeconds;
+		graceUsesActionBar = config.gracePeriodDisplay.equals("actionbar");
+		countdownUsesActionBar = config.countdownDisplay.equals("actionbar");
 	}
 
 	public static void onDisconnect(ServerPlayer player) {
@@ -102,7 +107,7 @@ public class LockManager {
 		if (required == 0) {
 			// Nobody is required, so the mod stays out of the way entirely.
 			if (state != State.RUNNING) {
-				clearTitles(players);
+				clearMessages(players);
 				unfreeze(server, players);
 				state = State.RUNNING;
 			}
@@ -118,7 +123,7 @@ public class LockManager {
 					if (allPresent) {
 						tickCountdown(server, players);
 					} else {
-						clearTitles(players);
+						clearMessages(players);
 						state = State.LOCKED;
 					}
 				}
@@ -130,7 +135,7 @@ public class LockManager {
 				}
 				case GRACE -> {
 					if (allPresent) {
-						clearTitles(players);
+						clearMessages(players);
 						state = State.RUNNING;
 					} else {
 						tickGrace(players);
@@ -152,12 +157,12 @@ public class LockManager {
 	private static void tickCountdown(MinecraftServer server, List<ServerPlayer> players) {
 		if (ticksIntoSecond == 0) {
 			if (secondsLeft == 0) {
-				clearTitles(players);
+				clearMessages(players);
 				unfreeze(server, players);
 				state = State.RUNNING;
 				return;
 			}
-			showTitle(players, Component.literal("Starting in " + secondsLeft), Component.empty());
+			showMessage(players, Component.literal("Starting in " + secondsLeft), Component.empty(), countdownUsesActionBar);
 		}
 		advanceTimer();
 	}
@@ -165,12 +170,12 @@ public class LockManager {
 	private static void tickGrace(List<ServerPlayer> players) {
 		if (ticksIntoSecond == 0) {
 			if (secondsLeft == 0) {
-				clearTitles(players);
+				clearMessages(players);
 				freeze(players);
 				state = State.LOCKED;
 				return;
 			}
-			showTitle(players, Component.literal("Freezing in " + secondsLeft + "s"), Component.literal("Required player(s) not present"));
+			showMessage(players, Component.literal("Freezing in " + secondsLeft + "s"), Component.literal("Required player(s) not present"), graceUsesActionBar);
 		}
 		advanceTimer();
 	}
@@ -228,17 +233,28 @@ public class LockManager {
 		}
 	}
 
-	private static void showTitle(List<ServerPlayer> players, Component title, Component subtitle) {
+	/**
+	 * Shows the message as a center title, or on the action bar above the hotbar if configured.
+	 * Both update in place, unlike chat. The action bar puts the subtitle first, on one line.
+	 */
+	private static void showMessage(List<ServerPlayer> players, Component title, Component subtitle, boolean useActionBar) {
+		Component actionBar = subtitle.getString().isEmpty() ? title : Component.empty().append(subtitle).append(". ").append(title);
 		for (ServerPlayer player : players) {
-			player.connection.send(new ClientboundSetTitlesAnimationPacket(0, TITLE_STAY_TICKS, 0));
-			player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
-			player.connection.send(new ClientboundSetTitleTextPacket(title));
+			if (useActionBar) {
+				player.connection.send(new ClientboundSetActionBarTextPacket(actionBar));
+			} else {
+				player.connection.send(new ClientboundSetTitlesAnimationPacket(0, TITLE_STAY_TICKS, 0));
+				player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
+				player.connection.send(new ClientboundSetTitleTextPacket(title));
+			}
 		}
 	}
 
-	private static void clearTitles(List<ServerPlayer> players) {
+	private static void clearMessages(List<ServerPlayer> players) {
+		// Clears both, in case the display mode was switched by a reload while a message was showing.
 		for (ServerPlayer player : players) {
 			player.connection.send(new ClientboundClearTitlesPacket(true));
+			player.connection.send(new ClientboundSetActionBarTextPacket(Component.empty()));
 		}
 	}
 
