@@ -1,5 +1,7 @@
 # No Player Left Behind
 
+> **Legacy version for Minecraft 1.21.11.** This branch only supports 1.21.11. For the latest Minecraft version, see the [`main` branch](https://github.com/Jc-42/no-player-left-behind).
+
 A server-side Fabric mod that prevents any one from playing on your server until every required player is online.
 
 Prevent anyone from playing on your SMP or co-op world until all players are online. When joining the server is frozen unless all required players are connected: no mobs, crops, redstone, day/night cycle, weather, or item progress. When the last required player joins, a short (configurable) countdown plays and the world starts up again for everyone.
@@ -67,7 +69,7 @@ Players who aren't on the required list are frozen along with everyone else, but
 
 ## Building
 
-Requires Java 25.
+Requires Java 21.
 
 ```sh
 ./gradlew build

@@ -115,7 +115,7 @@ public class PacketGate {
 			}
 			case ServerboundMoveVehiclePacket move -> {
 				Entity vehicle = player.getRootVehicle();
-				if (vehicle != player && move.movingTo().position().distanceToSqr(vehicle.position()) > POSITION_TOLERANCE_SQR && resyncCooldownOver(player)) {
+				if (vehicle != player && move.position().distanceToSqr(vehicle.position()) > POSITION_TOLERANCE_SQR && resyncCooldownOver(player)) {
 					listener.send(ClientboundMoveVehiclePacket.fromEntity(vehicle));
 				}
 			}
@@ -126,11 +126,11 @@ public class PacketGate {
 				player.containerMenu.sendAllDataToRemote();
 			}
 			case ServerboundUseItemOnPacket use -> {
-				listener.ackBlockChangesUpTo(use.sequence());
+				listener.ackBlockChangesUpTo(use.getSequence());
 				player.containerMenu.sendAllDataToRemote();
 			}
 			case ServerboundUseItemPacket use -> {
-				listener.ackBlockChangesUpTo(use.sequence());
+				listener.ackBlockChangesUpTo(use.getSequence());
 				player.containerMenu.sendAllDataToRemote();
 			}
 			default -> player.containerMenu.sendAllDataToRemote();

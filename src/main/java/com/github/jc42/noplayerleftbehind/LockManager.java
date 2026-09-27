@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Tracks whether all required players are online and drives the freeze.
@@ -57,7 +56,7 @@ public class LockManager {
 	private static int secondsLeft;
 	private static int ticksIntoSecond;
 
-	private static final ServerBossEvent BOSS_BAR = new ServerBossEvent(UUID.randomUUID(), Component.empty(), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
+	private static final ServerBossEvent BOSS_BAR = new ServerBossEvent(Component.empty(), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
 
 	public static boolean isFrozen() {
 		return frozen;
