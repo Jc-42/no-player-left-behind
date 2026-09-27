@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "noplayerleftbehind",
+	"version": "${version}",
+	"name": "No Player Left Behind",
+	"description": "Freezes the server until every required player is online.\nPause your SMP or co-op world whenever a friend is offline, so nobody plays ahead of the group.\nWait for all players to join before the game runs: no mobs, crops, time, or item progress while someone is missing.\nMade for friend groups, duo and trio survival worlds, and fair multiplayer progression.",
+	"authors": [
+		"Julian Carpenter"
+	],
+	"contact": {
+		"sources": "https://github.com/Jc-42/no-player-left-behind",
+		"issues": "https://github.com/Jc-42/no-player-left-behind/issues"
+	},
+	"license": "CC-BY-NC-SA-4.0",
+	"environment": "server",
+	"entrypoints": {
+		"main": [
+			"com.github.jc42.noplayerleftbehind.NoPlayerLeftBehind"
+		]
+	},
+	"mixins": [
+		"noplayerleftbehind.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": ">=0.161.0"
+	}
+}
